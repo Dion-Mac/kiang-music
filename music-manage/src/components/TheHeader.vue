@@ -1,15 +1,26 @@
 <template>
   <div class="header">
     <!--折叠图片-->
-    <div class="collapse-btn">
+    <div class="collapse-btn" @click="collapseChange">
       <i class="el-icon-menu"></i>
     </div>
   </div>
 </template>
 
 <script>
+import bus from '../assets/js/bus'
 export default {
-  name: 'TheHeader'
+  data () {
+    return{
+      collapse: true
+    }
+  },
+  methods:{
+    collapseChange () {
+      this.collapse = !this.collapse
+      bus.$emit('collapse', this.collapse)
+    }
+  }
 }
 </script>
 

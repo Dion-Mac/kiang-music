@@ -22,8 +22,8 @@
 </template>
 
 <script>
+import bus from "../assets/js/bus"
 export default {
-  name: 'TheAside',
   data () {
     return {
       collapse: false,
@@ -55,6 +55,12 @@ export default {
     onRoutes () {
       return this.$route.path.replace('/', '')
     }
+  },
+  created () {
+    //通过bus进行组件间的通信，来折叠侧边栏
+    bus.$on("collapse",msg=>{
+      this.collapse=msg
+    })
   }
 }
 </script>
