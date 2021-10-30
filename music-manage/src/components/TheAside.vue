@@ -1,0 +1,75 @@
+<template>
+  <div class="sidebar">
+    <el-menu class="sidebar-el-menu"
+             :default-active="onRoutes"
+             :collapse="collapse"
+             background-color="#334256"
+             text-color="#ffffff"
+             active-text-color="#20a0ff"
+             router
+    >
+      <template v-for="item in items">
+        <template>
+          <el-menu-item :index="item.index" :key="item.index">
+            <i :class="item.icon"></i>
+            {{item.title}}
+          </el-menu-item>
+        </template>
+      </template>
+
+    </el-menu>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'TheAside',
+  data () {
+    return {
+      collapse: false,
+      items:[
+        {
+          icon:"el-icon-document",
+          index: 'info',
+          title:"系统首页"
+        },
+        {
+          icon:"el-icon-document",
+          index: 'consumer',
+          title:"用户管理"
+        },
+        {
+          icon:"el-icon-document",
+          index: 'singer',
+          title:"歌手管理"
+        },
+        {
+          icon:"el-icon-document",
+          index: 'songList',
+          title:"歌单管理"
+        }
+      ]
+    }
+  },
+  computed:{
+    onRoutes () {
+      return this.$route.path.replace('/', '')
+    }
+  }
+}
+</script>
+
+<style scoped>
+.sidebar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 70px;
+  bottom: 0;
+  background-color: #334256;
+  overflow-y: scroll;
+},
+.sidebar-el-menu {
+  width: 150px;
+}
+</style>
