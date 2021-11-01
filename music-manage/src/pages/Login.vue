@@ -46,6 +46,7 @@ export default {
       params.append("password",this.ruleForm.password);
       getLoginStatus(params).then((res)=>{
         if (res.code == 1) {
+          localStorage.setItem('userName', this.ruleForm.username)
           this.$router.push("/info")
           this.notify('登录成功', 'success');
         } else {
