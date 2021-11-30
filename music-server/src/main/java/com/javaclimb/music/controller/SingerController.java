@@ -8,10 +8,13 @@ import com.javaclimb.music.util.Consts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.PublicKey;
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,7 +42,7 @@ public class SingerController {
         String location = request.getParameter("location").trim();
         String introduction = request.getParameter("introduction").trim();
         // 把生日转换成Date格式
-        DateFormat dataFormat = new SimpleDateFormat("yyyy-MMM-dd");
+        DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date birthDate = new Date();
         try {
             birthDate = dataFormat.parse(birth);
@@ -77,13 +80,12 @@ public class SingerController {
         String id = request.getParameter("id").trim();
         String name = request.getParameter("name").trim();
         String sex = request.getParameter("sex").trim();
-        String pic = request.getParameter("pic").trim();
         String birth = request.getParameter("birth").trim();
         String location = request.getParameter("location").trim();
         String introduction = request.getParameter("introduction").trim();
         // 把生日转换成Date格式
-        DateFormat dataFormat = new SimpleDateFormat("yyyy-MMM-dd");
-        Date birthDate = new Date();
+        DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date birthDate = null;
         try {
             birthDate = dataFormat.parse(birth);
         } catch (ParseException e) {
@@ -94,7 +96,6 @@ public class SingerController {
         singer.setId(Integer.parseInt(id));
         singer.setName(name);
         singer.setSex(new Byte(sex));
-        singer.setPic(pic);
         singer.setBirth(birthDate);
         singer.setLocation(location);
         singer.setIntroduction(introduction);
@@ -172,5 +173,57 @@ public class SingerController {
         return singerService.singerOfSex(Integer.parseInt(sex));
     }
 
+    /**
+     * 更新歌手图片
+     * @param avatorFile
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/updateSingerPic", method = RequestMethod.POST)
+    public Object updateSingerPic(@RequestParam("file") MultipartFile avatorFile, @RequestParam("id") int id) {
+        JSONObject jsonObject = new JSONObject();
+        if (avatorFile.isEmpty()) {
+            jsonObject.put(Consts.CODE, 0);
+            jsonObject.put(Consts.MSG, "文件上传失败");
+            return jsonObject;
+        }
+        // 文件名=当前时间到毫秒+原来的文件名
+        String fileName = System.currentTimeMillis() + avatorFile.getOriginalFilename();
+        // 如果文件路径不存在，新增改路径
+        String filePath = System.getProperty("user.dir") +System.getProperty("file.separator")+"img"
+                +System.getProperty("file.separator")
+                +"singerPic";
+        // 如果文件路径不存在，新增该路径
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        // 实际的文件地址
+        File dest = new File(filePath + System.getProperty("file.separator") + fileName);
+        // 存储到数据库的相对文件地址
+        String storeAvatorPath = "/img/singerPic/" + fileName;
+        try {
+            avatorFile.transferTo(dest);
+            Singer singer = new Singer();
+            singer.setId(id);
+            singer.setPic(storeAvatorPath);
+            boolean flag = singerService.update(singer);
+            if (flag) {
+                jsonObject.put(Consts.CODE, 1);
+                jsonObject.put(Consts.MSG, "上传成功");
+                jsonObject.put("pic", storeAvatorPath);
+                return jsonObject;
+            }
+            jsonObject.put(Consts.CODE, 0);
+            jsonObject.put(Consts.MSG, "上传失败");
+            return jsonObject;
+
+        } catch (IOException e) {
+            jsonObject.put(Consts.CODE, 0);
+            jsonObject.put(Consts.MSG, "上传失败" + e.getMessage());
+        } finally{
+            return jsonObject;
+        }
+    }
 
 }

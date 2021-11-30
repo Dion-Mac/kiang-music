@@ -5,8 +5,13 @@ export const getLoginStatus = (params) => post('admin/login/status', params);
 
 
 // 查询所有歌手
-export const getAllSinger = () => get('singer/allSinger')
+export const getAllSinger = () => get('singer/allSinger');
 
 // 添加歌手
 export const setSinger = (params) => post('singer/add', params);
 
+// 编辑歌手
+export const updateSinger = (params) => post('singer/update', params);
+
+// 删除歌手
+export const deleteSinger = (id) => get(`singer/delete?id=${id}`);
